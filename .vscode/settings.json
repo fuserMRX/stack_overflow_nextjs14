@@ -2,8 +2,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSeave": true,
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-        // "source.addMissingImports": true
+        "source.fixAll.eslint": "explicit"
     },
     "prettier.tabWidth": 4,
     "prettier.useTabs": false,
