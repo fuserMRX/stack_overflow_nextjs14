@@ -2,7 +2,8 @@ import Link from 'next/link';
 import React from 'react';
 import Image from 'next/image';
 import { SignedIn, UserButton } from '@clerk/nextjs';
-import Theme from './Theme';
+import Theme from '@/components/shared/navbar/Theme';
+import MobileNav from '@/components/shared/navbar/MobileNav';
 
 const Navbar = () => {
     return (
@@ -41,7 +42,7 @@ const Navbar = () => {
                         }}
                     />
                 </SignedIn>
-                MobileNav
+                <MobileNav />
             </div>
         </nav>
     );
