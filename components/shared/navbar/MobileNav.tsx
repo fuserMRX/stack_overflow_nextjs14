@@ -72,7 +72,7 @@ const MobileNav = () => {
             </SheetTrigger>
             <SheetContent
                 side='left'
-                className='bg-white dark:background-light900_dark200 text-dark900 dark:text-light900 border-none'
+                className='dark:background-light900_dark200 border-none bg-white'
             >
                 <Link href='/' className='flex items-center gap-1'>
                     <Image
@@ -112,8 +112,8 @@ const MobileNav = () => {
                                 <Link href='/sign-up'>
                                     <Button
                                         className='small-medium light-border-2 btn-tertiary
-                                    min-h-[41px] w-full rounded-lg px-4 py-3
-                                    shadow-none text-dark400_light900'
+                                    text-dark400_light900 min-h-[41px] w-full rounded-lg px-4
+                                    py-3 shadow-none'
                                     >
                                         Sign Up
                                     </Button>

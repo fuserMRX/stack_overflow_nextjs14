@@ -4,7 +4,7 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import React from 'react';
 import './globals.css';
-import { ThemeProvider } from '@/context/ThemeProvider';
+import { ThemeProvider } from 'next-themes';
 
 const inter = Inter({
     subsets: ['latin'],
@@ -32,7 +32,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang='en'>
+        <html lang='en' suppressHydrationWarning>
             <body className={`${inter.variable} ${spaceGrotesk.variable}`}>
                 <ClerkProvider
                     appearance={{
@@ -43,7 +43,13 @@ export default function RootLayout({
                         },
                     }}
                 >
-                    <ThemeProvider>{children}</ThemeProvider>
+                    <ThemeProvider
+                        attribute='class'
+                        defaultTheme='system'
+                        enableSystem={true}
+                    >
+                        {children}
+                    </ThemeProvider>
                 </ClerkProvider>
             </body>
         </html>

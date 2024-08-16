@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
-import { useTheme } from '@/context/ThemeProvider';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { themes } from '@/constants';
+import { useTheme } from 'next-themes';
 
 import {
     Menubar,
@@ -13,11 +13,18 @@ import {
     MenubarTrigger,
 } from '@/components/ui/menubar';
 
-const Theme = () => {
-    const { theme, toggleTheme } = useTheme();
-    const activeTheme = themes.find(
-        (item) => item.value === localStorage.getItem('theme')
-    );
+const ThemeComponent = () => {
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    // Wait until after client-side hydration to show the UI
+    // and avoid mismatch of the server and client side rendered content
+    useEffect(() => setMounted(true), []);
+
+    if (!mounted) return null; // Skip rendering until the component is mounted
+
+    const activeTheme =
+        themes.find((item) => item.value === theme) || themes[0];
 
     return (
         <Menubar className='relative border-none bg-transparent shadow-none'>
@@ -26,24 +33,13 @@ const Theme = () => {
                     className='focus:bg-light-900 data-[state=open]:bg-light-900
                  dark:focus:bg-dark-200 dark:data-[state=open]:bg-dark-200'
                 >
-                    {activeTheme ? (
-                        <Image
-                            key={activeTheme?.value}
-                            className='active-theme'
-                            src={activeTheme?.icon}
-                            width={20}
-                            height={20}
-                            alt={activeTheme?.label}
-                        />
-                    ) : (
-                        <Image
-                            className='active-theme'
-                            src='/assets/icons/computer.svg'
-                            width={20}
-                            height={20}
-                            alt='System Theme'
-                        />
-                    )}
+                    <Image
+                        className='active-theme'
+                        src={activeTheme?.icon}
+                        width={20}
+                        height={20}
+                        alt={activeTheme?.value}
+                    />
                 </MenubarTrigger>
                 <MenubarContent
                     className='absolute -right-12 mt-3 min-w-[120px]
@@ -52,7 +48,7 @@ const Theme = () => {
                     {themes.map((item) => (
                         <MenubarItem
                             key={item.value}
-                            onClick={() => toggleTheme(item.value)}
+                            onClick={() => setTheme(item.value)}
                             className='flex items-center gap-4 
                             px-2.5 py-2 dark:focus:bg-dark-400'
                         >
@@ -77,4 +73,4 @@ const Theme = () => {
     );
 };
 
-export default Theme;
+export default ThemeComponent;
