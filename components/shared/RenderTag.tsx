@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import type { JSX } from 'react';
 
 interface RenderTagProps {
     _id: number;
