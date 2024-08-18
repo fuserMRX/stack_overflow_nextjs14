@@ -176,7 +176,7 @@
     }
 
     .placeholder {
-        @apply placeholder:text-light-400 dark:placeholder:text-light-500;
+        @apply text-light-500 dark:text-light-500 dark:placeholder:text-light-500;
     }
 
     .invert-colors {
