@@ -24,3 +24,11 @@ function useMediaQuery(query: string): boolean {
 }
 
 export default useMediaQuery;
+
+export const useIsDesktop = (): boolean => {
+    return useMediaQuery('(min-width: 1024px)');
+};
+
+export const useIsMobile = (): boolean => {
+    return useMediaQuery('(max-width: 640px)');
+};
