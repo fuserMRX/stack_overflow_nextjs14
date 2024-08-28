@@ -21,7 +21,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { QuestionsSchema } from '@/lib/validations';
 
-const type:any = 'create';
+const type: any = 'create';
 
 const Question = () => {
     const editorRef = useRef(null);
@@ -38,14 +38,13 @@ const Question = () => {
     });
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+    async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
         setIsSubmitting(true);
 
         try {
-            // make an async call to the DB -> create a quesiton
-            
+            // make an async call to the DB -> create a question
         } catch (e) {
-
+            console.error(e);
         } finally {
             setIsSubmitting(false);
         }
@@ -73,16 +72,26 @@ const Question = () => {
                     tagInput.value = '';
                     form.clearErrors('tags');
                 }
-            } else {
-                form.trigger();
             }
         }
     };
 
     const handleTagRemove = (tag: string, field: any) => {
         const newTags = field.value.filter((t: string) => t !== tag);
-
         form.setValue('tags', newTags);
+
+        if (!newTags.length) {
+            form.setError('tags', {
+                type: 'manual',
+                message: 'At least one tag is required',
+            });
+        }
+    };
+
+    const handleEditorChange = (content: string) => {
+        console.log('content length', content.length);
+        form.setValue('explanation', content);
+        form.trigger('explanation'); // Manually trigger validation for explanation
     };
 
     return (
@@ -133,6 +142,7 @@ const Question = () => {
                                         // @ts-ignore
                                         (editorRef.current = editor)
                                     }
+                                    onEditorChange={handleEditorChange}
                                     initialValue=''
                                     init={{
                                         height: 350,
@@ -226,7 +236,9 @@ const Question = () => {
                                 Add up to 3 tags to describe what your question
                                 is about. You need to press enter to add a tag.
                             </FormDescription>
-                            <FormMessage className='text-red-500' />
+                            <FormMessage className='text-red-500'>
+                                {form.formState.errors.tags?.message}
+                            </FormMessage>
                         </FormItem>
                     )}
                 />
