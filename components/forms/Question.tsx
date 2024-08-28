@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { QuestionsSchema } from '@/lib/validations';
+import { createQuestion } from '@/lib/actions/question.action';
 
 const type: any = 'create';
 
@@ -43,6 +44,7 @@ const Question = () => {
 
         try {
             // make an async call to the DB -> create a question
+            await createQuestion(values);
         } catch (e) {
             console.error(e);
         } finally {
@@ -89,7 +91,6 @@ const Question = () => {
     };
 
     const handleEditorChange = (content: string) => {
-        console.log('content length', content.length);
         form.setValue('explanation', content);
         form.trigger('explanation'); // Manually trigger validation for explanation
     };
@@ -142,6 +143,7 @@ const Question = () => {
                                         // @ts-ignore
                                         (editorRef.current = editor)
                                     }
+                                    onBlur={field.onBlur}
                                     onEditorChange={handleEditorChange}
                                     initialValue=''
                                     init={{
