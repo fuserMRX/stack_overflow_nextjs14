@@ -6,7 +6,7 @@ export const connectToDatabase = async () => {
     // strictQuery: true: This setting ensures that Mongoose
     // only includes properties in query filters that are defined
     // in the Mongoose schema. If you attempt to query using a
-    // property that isn't defined in your schema, 
+    // property that isn't defined in your schema,
     // Mongoose will strip out that part of the query filter.
     mongoose.set('strictQuery', true);
 

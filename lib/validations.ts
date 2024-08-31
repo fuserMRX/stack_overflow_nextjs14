@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const QuestionsSchema = z.object({
-    title: z.string().min(5, "Title must be at least 5 characters").max(20, "Title must be less than 130 characters"),
+    title: z.string().min(5, "Title must be at least 5 characters").max(50, "Title must be less than 50 characters"),
     explanation: z.string().min(20, "Explanation must be at least 10 characters"),
     tags: z.array(
         z.string()
