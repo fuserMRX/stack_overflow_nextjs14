@@ -7,45 +7,11 @@ import { HomePageFilters } from '@/constants/filters';
 import HomeFilters from '@/components/home/HomeFilters';
 import NoResult from '@/components/shared/NoResult';
 import QuestionCard from '@/components/cards/QuestionCard';
+import { getQuestions } from '@/lib/actions/question.action';
 
-const questions = [
-    {
-        _id: '1',
-        title: 'Cascading Deletes in SQLAlchemy',
-        tags: [
-            { _id: '1', name: 'python' },
-            { _id: '2', name: 'sql' },
-        ],
-        author: {
-            _id: '1',
-            name: 'John Doe',
-            picture: 'https://randomuser.me/api/portraits/men/1.jpg',
-        },
-        upvotes: 1500000,
-        views: 2500,
-        answers: [],
-        createdAt: new Date('2023-09-01T12:00:00.000Z'),
-    },
-    {
-        _id: '2',
-        title: 'The Lightning Component c:LWC_PizzaTracker generated invalid output for field status. Error How to solve this',
-        tags: [
-            { _id: '3', name: 'css' },
-            { _id: '4', name: 'lwc' },
-        ],
-        author: {
-            _id: '2',
-            name: 'Jane Doe',
-            picture: 'https://randomuser.me/api/portraits/women/2.jpg',
-        },
-        upvotes: 15,
-        views: 200,
-        answers: [],
-        createdAt: new Date('2024-08-02T15:30:00.000Z'),
-    },
-];
+const Home = async () => {
+    const { questions } = await getQuestions({});
 
-const Home = () => {
     return (
         <>
             <div
