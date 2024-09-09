@@ -8,6 +8,12 @@ const nextConfig = {
             // port: '',
             // pathname: '/account123/**',
           },
+          {
+            protocol: 'https',
+            hostname: 'img.clerk.com',
+            // port: '',
+            // pathname: '/account123/**',
+          },
         ],
       },
     // reactStrictMode: false
