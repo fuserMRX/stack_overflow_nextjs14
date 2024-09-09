@@ -73,6 +73,7 @@ export async function deleteUser(params: DeleteUserParams) {
 
         // TODO: delete user answers, comments, etc.
 
+        //  user is deleted two times - redundant!
         const deletedUser = await User.findByIdAndDelete(user._id);
 
         return deletedUser;
