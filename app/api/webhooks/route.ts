@@ -52,9 +52,10 @@ export async function POST(req: Request) {
     // Do something with the payload
     // For this guide, you simply log the payload to the console
     const eventType = evt.type;
+    console.log(eventType);
 
     if (eventType === 'user.created') {
-        const { id, email_addresses, image_url, username,
+        const { id, email_addresses, image_url,
             first_name, last_name
         } = evt.data;
 
@@ -62,7 +63,6 @@ export async function POST(req: Request) {
         const mongoUser = await createUser({
             clerkId: id,
             name: `${first_name}${last_name ? ` ${last_name}` : ''}`,
-            username,
             email: email_addresses[0].email_address,
             picture: image_url,
         });
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     }
 
     if (eventType === 'user.updated') {
-        const { id, email_addresses, image_url, username,
+        const { id, email_addresses, image_url,
             first_name, last_name
         } = evt.data;
 
@@ -80,7 +80,6 @@ export async function POST(req: Request) {
             clerkId: id,
             updateData: {
                 name: `${first_name}${last_name ? ` ${last_name}` : ''}`,
-                username,
                 email: email_addresses[0].email_address,
                 picture: image_url,
             },
