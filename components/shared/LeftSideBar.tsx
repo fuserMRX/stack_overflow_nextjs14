@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { SignedOut } from '@clerk/nextjs';
 
 const LeftSideBar = () => {
+    // usePathname causes page to re-render several times sometimes (Profiler shows context change)
     const pathname = usePathname();
 
     return (
@@ -20,9 +21,7 @@ const LeftSideBar = () => {
         >
             <div className='flex flex-1 flex-col gap-6'>
                 {sidebarLinks.map((link) => {
-                    const isActive =
-                        (pathname.includes(link.route) && link.route.length) ||
-                        pathname === link.route;
+                    const isActive = (pathname === link.route);
 
                     return (
                         <Link

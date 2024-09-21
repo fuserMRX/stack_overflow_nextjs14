@@ -2,7 +2,10 @@
 
 import User from '@/database/user.model';
 import { connectToDatabase } from '@/lib/mongoose';
-import { CreateUserParams, DeleteUserParams, UpdateUserParams } from '@/lib/actions/shared.types';
+import {
+    CreateUserParams, DeleteUserParams,
+    GetAllUsersParams, UpdateUserParams
+} from '@/lib/actions/shared.types';
 import { revalidatePath } from 'next/cache';
 import Question from '@/database/question.model';
 
@@ -38,7 +41,7 @@ export async function updateUser(params: UpdateUserParams) {
         connectToDatabase();
         const { clerkId, updateData, path } = params;
 
-        await User.findOneAndUpdate({clerkId}, updateData, {
+        await User.findOneAndUpdate({ clerkId }, updateData, {
             new: true
         });
 
@@ -69,7 +72,7 @@ export async function deleteUser(params: DeleteUserParams) {
         // }).distinct('_id');
 
         // delete user questions
-        await Question.deleteMany({ author: user._id});
+        await Question.deleteMany({ author: user._id });
 
         // TODO: delete user answers, comments, etc.
 
@@ -78,6 +81,21 @@ export async function deleteUser(params: DeleteUserParams) {
 
         return deletedUser;
 
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+export async function getAllUsers(params: GetAllUsersParams) {
+    try {
+        connectToDatabase();
+        // const { page = 1, pageSize = 20, filter, searchQuery } = params;
+
+        const users = await User.find({})
+            .sort({ createdAt: -1 });
+
+        return { users };
     } catch (e) {
         console.log(e);
         throw e;
