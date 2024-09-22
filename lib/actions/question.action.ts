@@ -4,7 +4,7 @@ import Question from '@/database/question.model';
 import Tag from '@/database/tag.model';
 import User from '@/database/user.model';
 import { connectToDatabase } from '@/lib/mongoose';
-import { GetQuestionsParams, CreateQuestionParams } from '@/lib/actions/shared.types';
+import { GetQuestionsParams, CreateQuestionParams, GetQuestionByIdParams } from '@/lib/actions/shared.types';
 import { revalidatePath } from 'next/cache';
 
 export async function getQuestions(params: GetQuestionsParams) {
@@ -18,6 +18,24 @@ export async function getQuestions(params: GetQuestionsParams) {
             .sort({ createdAt: -1 });
 
         return { questions };
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+export async function getQuestionById(params: GetQuestionByIdParams) {
+    try {
+        connectToDatabase();
+
+        const { questionId } = params;
+
+        // populate because we want to get the tags and author details
+        const question = await Question.findById(questionId)
+            .populate({ path: 'tags', model: Tag, select: '_id name' })
+            .populate({ path: 'author', model: User, select: '_id clerkId name picture' });
+
+        return question;
     } catch (e) {
         console.log(e);
         throw e;
