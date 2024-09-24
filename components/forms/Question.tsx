@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Editor } from '@tinymce/tinymce-react';
 import { Badge } from '@/components/ui/badge';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 
 import {
@@ -29,7 +30,12 @@ interface QuestionProps {
     mongoUserId: string;
 }
 
-const Question = ({ mongoUserId }: QuestionProps ) => {
+const Question = ({ mongoUserId }: QuestionProps) => {
+    const { theme } = useTheme();
+    const skin = (theme === 'dark' || theme === 'system') ? 'oxide-dark' : 'oxide';
+    // eslint-disable-next-line camelcase
+    const content_css = (theme === 'dark' || theme === 'system') ? 'dark' : 'default';
+
     const editorRef = useRef(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
@@ -151,6 +157,7 @@ const Question = ({ mongoUserId }: QuestionProps ) => {
                             </FormLabel>
                             <FormControl className='mt-3.5'>
                                 <Editor
+                                    key={theme}
                                     apiKey={
                                         process.env.NEXT_PUBLIC_TINYMCE_API_KEY
                                     }
@@ -188,6 +195,9 @@ const Question = ({ mongoUserId }: QuestionProps ) => {
                                             'removeformat',
                                         content_style:
                                             'body { font-family:Inter; font-size:16px }',
+                                        skin,
+                                        // eslint-disable-next-line camelcase
+                                        content_css,
                                     }}
                                 />
                             </FormControl>
