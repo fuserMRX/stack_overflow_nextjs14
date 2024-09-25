@@ -11,3 +11,7 @@ export const QuestionsSchema = z.object({
         .min(1, "You must add at least 1 tag")
         .max(3, "You can add up to 3 tags only"),
 });
+
+export const AnswerSchema = z.object({
+    answer: z.string().min(20)
+});
