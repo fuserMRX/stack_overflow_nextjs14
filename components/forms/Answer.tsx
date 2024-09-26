@@ -16,8 +16,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Editor } from '@tinymce/tinymce-react';
 import { useTheme } from 'next-themes';
 import { Button } from '../ui/button';
+import { createAnswer } from '@/lib/actions/asnwer.action';
+import { usePathname } from 'next/navigation';
 
-const Answer = () => {
+interface AnswerProps {
+    question: string;
+    questionId: string;
+    authorId: string;
+}
+
+const Answer = ({ question, questionId, authorId }: AnswerProps) => {
+    const pathname = usePathname();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { theme } = useTheme();
     const skin =
@@ -34,7 +43,30 @@ const Answer = () => {
         },
     });
 
-    const handleCreateAnswer = () => {};
+    const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
+        setIsSubmitting(true);
+
+        try {
+            await createAnswer({
+                content: values.answer,
+                author: JSON.parse(authorId),
+                question: JSON.parse(questionId),
+                path: pathname,
+            });
+
+            form.reset();
+
+            if (editorRef.current) {
+                // @ts-ignore
+                editorRef.current.setContent('');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const handleEditorChange = (content: string) => {
         form.setValue('answer', content);
         form.trigger('answer'); // Manually trigger validation for explanation
