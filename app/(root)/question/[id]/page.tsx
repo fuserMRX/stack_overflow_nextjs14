@@ -19,7 +19,6 @@ const Question = async ({ params, searchParams }) => {
 
     if (clerkId) {
         mongoUser = await getUserById({ userId: clerkId });
-        console.log('mongoUser =========================', mongoUser);
     }
 
     return (
@@ -44,7 +43,20 @@ const Question = async ({ params, searchParams }) => {
                             {result.author.name}
                         </p>
                     </Link>
-                    <div className='flex justify-end'><Votes/></div>
+                    <div className='flex justify-end'>
+                        <Votes
+                            type='question'
+                            itemId={JSON.stringify(result._id)}
+                            userId={JSON.stringify(mongoUser._id)}
+                            upvotes={result.upvotes.length}
+                            downvotes={result.downvotes.length}
+                            hasupVoted={result.upvotes.includes(mongoUser._id)}
+                            hasdownVoted={result.downvotes.includes(
+                                mongoUser._id
+                            )}
+                            hasSaved={mongoUser?.saved.includes(result._id)}
+                        />
+                    </div>
                 </div>
                 <h2
                     className='h2-semibold text-dark200_light900
