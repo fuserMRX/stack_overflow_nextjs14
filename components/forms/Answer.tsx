@@ -16,7 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Editor } from '@tinymce/tinymce-react';
 import { useTheme } from 'next-themes';
 import { Button } from '../ui/button';
-import { createAnswer } from '@/lib/actions/asnwer.action';
+import { createAnswer } from '@/lib/actions/answer.action';
 import { usePathname } from 'next/navigation';
 
 interface AnswerProps {
@@ -58,7 +58,8 @@ const Answer = ({ question, questionId, authorId }: AnswerProps) => {
 
             if (editorRef.current) {
                 // @ts-ignore
-                editorRef.current.setContent('');
+                // { format: 'html', no_events: true } => prevents validation trigger after cleaning the content
+                editorRef.current.setContent('', { format: 'html', no_events: true });
             }
         } catch (error) {
             console.error(error);

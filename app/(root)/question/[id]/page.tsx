@@ -8,6 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { auth } from '@clerk/nextjs/server';
 import { getUserById } from '@/lib/actions/user.action';
+import AllAnswers from '@/components/shared/AllAnswers';
+import Votes from '@/components/shared/Votes';
 
 const Question = async ({ params, searchParams }) => {
     const result = await getQuestionById({ questionId: params.id });
@@ -15,8 +17,9 @@ const Question = async ({ params, searchParams }) => {
 
     let mongoUser;
 
-    if(clerkId) {
+    if (clerkId) {
         mongoUser = await getUserById({ userId: clerkId });
+        console.log('mongoUser =========================', mongoUser);
     }
 
     return (
@@ -41,7 +44,7 @@ const Question = async ({ params, searchParams }) => {
                             {result.author.name}
                         </p>
                     </Link>
-                    <div className='flex justify-end'>VOTING</div>
+                    <div className='flex justify-end'><Votes/></div>
                 </div>
                 <h2
                     className='h2-semibold text-dark200_light900
@@ -85,6 +88,11 @@ const Question = async ({ params, searchParams }) => {
                     />
                 ))}
             </div>
+            <AllAnswers
+                questionId={result._id}
+                userId={JSON.stringify(mongoUser._id)}
+                totalAnswers={result.answers.length}
+            />
             <Answer
                 question={result.content}
                 questionId={JSON.stringify(result._id)}
