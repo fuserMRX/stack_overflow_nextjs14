@@ -1,7 +1,9 @@
 'use client';
 
+import { downvoteQuestion, upvoteQuestion } from '@/lib/actions/question.action';
 import { formatLargeNumber } from '@/lib/utils';
 import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface VotingParams {
     type: string;
@@ -24,9 +26,54 @@ const Voting = ({
     hasdownVoted,
     hasSaved,
 }: VotingParams) => {
+    const pathName = usePathname();
+    const router = useRouter();
+
     const handleSave = () => {};
 
-    const handleVote = (action: string) => {};
+    const handleVote = async (action: string) => {
+        if (userId) {
+            if (action === 'upvote' && type === 'question') {
+                await upvoteQuestion({
+                    questionId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasupVoted,
+                    hasdownVoted,
+                    path: pathName,
+                });
+            }
+
+            // if (action === 'upvote' && type === 'answer') {
+            //     await upvoteAnswer({
+            //         questionId: JSON.parse(itemId),
+            //         userId: JSON.parse(userId),
+            //         hasupVoted,
+            //         hasdownVoted,
+            //         path: pathName,
+            //     });
+            // }
+
+            if (action === 'downvote' && type === 'question') {
+                await downvoteQuestion({
+                    questionId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasupVoted,
+                    hasdownVoted,
+                    path: pathName,
+                });
+            }
+
+            // if (action === 'downvote' && type === 'answer') {
+            //     await downvoteAnswer({
+            //         questionId: JSON.parse(itemId),
+            //         userId: JSON.parse(userId),
+            //         hasupVoted,
+            //         hasdownVoted,
+            //         path: pathName,
+            //     });
+            // }
+        }
+    };
 
     return (
         <div className='gap-5'>
