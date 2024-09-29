@@ -1,8 +1,8 @@
 'use client';
 
+import { useEffect, useState, useRef } from 'react';
 import Prism from 'prismjs';
 import parse from 'html-react-parser';
-import { useEffect } from 'react';
 
 import 'prismjs/components/prism-java';
 import 'prismjs/components/prism-c';
@@ -31,11 +31,25 @@ interface ParseHTMLProps {
 }
 
 const ParseHTML = ({ data }: ParseHTMLProps) => {
+    const [mounted, setMounted] = useState(false); // This state determines if the component is mounted
+    const ref = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
-        Prism.highlightAll();
+        setMounted(true); // Set the mounted state to true when the component is mounted
     }, []);
 
-    return <div>{parse(data)}</div>;
+    useEffect(() => {
+        if (mounted && ref.current) {
+            Prism.highlightAllUnder(ref.current);
+        }
+    }, [mounted, data]); // Re-run highlighting when mounted or data changes
+
+    if (!mounted) {
+        // Avoid rendering on the server to prevent mismatches
+        return null;
+    }
+
+    return <div ref={ref}>{parse(data)}</div>;
 };
 
 export default ParseHTML;

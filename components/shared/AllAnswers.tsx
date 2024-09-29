@@ -1,10 +1,12 @@
+
+import Link from 'next/link';
+import Image from 'next/image';
+import ParseHTML from './ParseHTML';
+
 import Filter from '@/components/shared/Filter';
 import { AnswerFilters } from '@/constants/filters';
 import { getAnswers } from '@/lib/actions/answer.action';
-import Link from 'next/link';
-import Image from 'next/image';
 import { getTimestamp } from '@/lib/utils';
-import ParseHTML from './ParseHTML';
 import Votes from '@/components/shared/Votes';
 
 interface AllAnswersProps {
