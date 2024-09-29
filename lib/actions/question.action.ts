@@ -4,7 +4,10 @@ import Question from '@/database/question.model';
 import Tag from '@/database/tag.model';
 import User from '@/database/user.model';
 import { connectToDatabase } from '@/lib/mongoose';
-import { GetQuestionsParams, CreateQuestionParams, GetQuestionByIdParams } from '@/lib/actions/shared.types';
+import {
+    GetQuestionsParams, CreateQuestionParams,
+    GetQuestionByIdParams, QuestionVoteParams
+} from '@/lib/actions/shared.types';
 import { revalidatePath } from 'next/cache';
 
 export async function getQuestions(params: GetQuestionsParams) {
@@ -79,5 +82,82 @@ export async function createQuestion(params: CreateQuestionParams) {
         revalidatePath(path);
     } catch (error) {
         console.error(error);
+    }
+}
+
+export async function upvoteQuestion(params: QuestionVoteParams) {
+    try {
+        connectToDatabase();
+
+        const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+        let updateQuery = {};
+
+        // Action: Removes the user's ID from the upvotes array of the question.
+        // Reason: The user is retracting their upvote (toggling it off).
+        if (hasupVoted) {
+            updateQuery = { $pull: { upvotes: userId } };
+        } else if (hasdownVoted) {
+            // Removes the user's ID from the downvotes array.
+            // Adds the user's ID to the upvotes array.
+            // Reason: The user is changing their vote from a downvote to an upvote.
+            updateQuery = {
+                $pull: { downvotes: userId },
+                $push: { upvotes: userId },
+            };
+        } else {
+            // Action: Adds the user's ID to the upvotes array if it's not already present.
+            // Reason: The user is upvoting the question for the first time.
+            updateQuery = { $addToSet: { upvotes: userId } };
+        }
+
+        // { new: true }: Option to return the modified document rather than the original.
+        const question = await Question.findByIdAndUpdate(questionId, updateQuery, { new: true });
+
+        if (!question) {
+            throw new Error('Question not found');
+        }
+
+        // Increment author's reputation
+
+        revalidatePath(path);
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+export async function downvoteQuestion(params: QuestionVoteParams) {
+    try {
+        connectToDatabase();
+
+        const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+        let updateQuery = {};
+
+        if (hasdownVoted) {
+            updateQuery = { $pull: { downvotes: userId } };
+        } else if (hasupVoted) {
+            updateQuery = {
+                $pull: { upvotes: userId },
+                $push: { downvotes: userId },
+            };
+        } else {
+            updateQuery = { $addToSet: { downvotes: userId } };
+        }
+
+        // { new: true }: Option to return the modified document rather than the original.
+        const question = await Question.findByIdAndUpdate(questionId, updateQuery, { new: true });
+
+        if (!question) {
+            throw new Error('Question not found');
+        }
+
+        // Increment author's reputation
+
+        revalidatePath(path);
+    } catch (e) {
+        console.log(e);
+        throw e;
     }
 }
