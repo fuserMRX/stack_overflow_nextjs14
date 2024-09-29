@@ -1,6 +1,10 @@
 'use client';
 
-import { downvoteQuestion, upvoteQuestion } from '@/lib/actions/question.action';
+import { downvoteAnswer, upvoteAnswer } from '@/lib/actions/answer.action';
+import {
+    downvoteQuestion,
+    upvoteQuestion,
+} from '@/lib/actions/question.action';
 import { formatLargeNumber } from '@/lib/utils';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -43,15 +47,15 @@ const Voting = ({
                 });
             }
 
-            // if (action === 'upvote' && type === 'answer') {
-            //     await upvoteAnswer({
-            //         questionId: JSON.parse(itemId),
-            //         userId: JSON.parse(userId),
-            //         hasupVoted,
-            //         hasdownVoted,
-            //         path: pathName,
-            //     });
-            // }
+            if (action === 'upvote' && type === 'answer') {
+                await upvoteAnswer({
+                    answerId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasupVoted,
+                    hasdownVoted,
+                    path: pathName,
+                });
+            }
 
             if (action === 'downvote' && type === 'question') {
                 await downvoteQuestion({
@@ -63,15 +67,15 @@ const Voting = ({
                 });
             }
 
-            // if (action === 'downvote' && type === 'answer') {
-            //     await downvoteAnswer({
-            //         questionId: JSON.parse(itemId),
-            //         userId: JSON.parse(userId),
-            //         hasupVoted,
-            //         hasdownVoted,
-            //         path: pathName,
-            //     });
-            // }
+            if (action === 'downvote' && type === 'answer') {
+                await downvoteAnswer({
+                    answerId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasupVoted,
+                    hasdownVoted,
+                    path: pathName,
+                });
+            }
         }
     };
 
@@ -127,18 +131,20 @@ const Voting = ({
                     </div>
                 </div>
                 {/* Saved questions */}
-                <Image
-                    src={
-                        hasSaved
-                            ? '/assets/icons/star-filled.svg'
-                            : '/assets/icons/star-red.svg'
-                    }
-                    alt='Star'
-                    width={16}
-                    height={16}
-                    className='cursor-pointer'
-                    onClick={handleSave}
-                />
+                {type === 'question' && (
+                    <Image
+                        src={
+                            hasSaved
+                                ? '/assets/icons/star-filled.svg'
+                                : '/assets/icons/star-red.svg'
+                        }
+                        alt='Star'
+                        width={16}
+                        height={16}
+                        className='cursor-pointer'
+                        onClick={handleSave}
+                    />
+                )}
             </div>
         </div>
     );

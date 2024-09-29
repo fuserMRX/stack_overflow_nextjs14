@@ -1,7 +1,7 @@
 'use server';
 
 import { connectToDatabase } from '@/lib/mongoose';
-import { CreateAnswerParams, GetAnswersParams } from '@/lib/actions/shared.types';
+import { AnswerVoteParams, CreateAnswerParams, GetAnswersParams } from '@/lib/actions/shared.types';
 import Answer from '@/database/answer.model';
 import Question from '@/database/question.model';
 import { revalidatePath } from 'next/cache';
@@ -45,5 +45,82 @@ export async function getAnswers(params: GetAnswersParams) {
     } catch (error) {
         console.log(error);
         throw error;
+    }
+}
+
+export async function upvoteAnswer(params: AnswerVoteParams) {
+    try {
+        connectToDatabase();
+
+        const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
+
+        let updateQuery = {};
+
+        // Action: Removes the user's ID from the upvotes array of the answer.
+        // Reason: The user is retracting their upvote (toggling it off).
+        if (hasupVoted) {
+            updateQuery = { $pull: { upvotes: userId } };
+        } else if (hasdownVoted) {
+            // Removes the user's ID from the downvotes array.
+            // Adds the user's ID to the upvotes array.
+            // Reason: The user is changing their vote from a downvote to an upvote.
+            updateQuery = {
+                $pull: { downvotes: userId },
+                $push: { upvotes: userId },
+            };
+        } else {
+            // Action: Adds the user's ID to the upvotes array if it's not already present.
+            // Reason: The user is upvoting the answer for the first time.
+            updateQuery = { $addToSet: { upvotes: userId } };
+        }
+
+        // { new: true }: Option to return the modified document rather than the original.
+        const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, { new: true });
+
+        if (!answer) {
+            throw new Error('Answer not found');
+        }
+
+        // Increment author's reputation
+
+        revalidatePath(path);
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+export async function downvoteAnswer(params: AnswerVoteParams) {
+    try {
+        connectToDatabase();
+
+        const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
+
+        let updateQuery = {};
+
+        if (hasdownVoted) {
+            updateQuery = { $pull: { downvotes: userId } };
+        } else if (hasupVoted) {
+            updateQuery = {
+                $pull: { upvotes: userId },
+                $push: { downvotes: userId },
+            };
+        } else {
+            updateQuery = { $addToSet: { downvotes: userId } };
+        }
+
+        // { new: true }: Option to return the modified document rather than the original.
+        const question = await Answer.findByIdAndUpdate(answerId, updateQuery, { new: true });
+
+        if (!question) {
+            throw new Error('Answer not found');
+        }
+
+        // Increment author's reputation
+
+        revalidatePath(path);
+    } catch (e) {
+        console.log(e);
+        throw e;
     }
 }
