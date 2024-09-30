@@ -31,6 +31,8 @@ interface ParseHTMLProps {
 }
 
 const ParseHTML = ({ data }: ParseHTMLProps) => {
+    // useState and useEffect are used to run the Prism highlighting function after the component is mounted
+    // and prevent mismatches between the server and client - hydrating the component
     const [mounted, setMounted] = useState(false); // This state determines if the component is mounted
     const ref = useRef<HTMLDivElement>(null);
 

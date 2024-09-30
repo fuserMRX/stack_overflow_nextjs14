@@ -10,7 +10,7 @@ import NoResult from '@/components/shared/NoResult';
 import QuestionCard from '@/components/cards/QuestionCard';
 import { getQuestions } from '@/lib/actions/question.action';
 
-const Home = async () => {
+const Collection = async () => {
     const { questions } = await getQuestions({});
 
     return (
@@ -79,4 +79,4 @@ const Home = async () => {
     );
 };
 
-export default Home;
+export default Collection;

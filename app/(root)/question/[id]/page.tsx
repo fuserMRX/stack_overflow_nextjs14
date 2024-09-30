@@ -22,7 +22,7 @@ const Question = async ({ params, searchParams }) => {
     }
 
     return (
-        <>
+        <div>
             <div className='flex-start w-full flex-col'>
                 <div
                     className='flex w-full flex-col-reverse justify-between
@@ -110,7 +110,7 @@ const Question = async ({ params, searchParams }) => {
                 questionId={JSON.stringify(result._id)}
                 authorId={JSON.stringify(mongoUser._id)}
             />
-        </>
+        </div>
     );
 };
 
