@@ -20,16 +20,11 @@ const UserCard = async ({ user }: UserCardProps) => {
     });
 
     return (
-        <Link
-            href={`/profile/${user.clerkId}`}
-            className='shadow-light100_darknone w-full max-xs:min-w-full
-        xs:w-[260px]'
+        <article
+            className='shadow-light100_darknone background-light900_dark200 light-border flex w-full
+            flex-col items-center justify-center rounded-2xl border p-8 max-xs:min-w-full xs:w-[260px]'
         >
-            <article
-                className='background-light900_dark200
-            light-border flex w-full flex-col items-center
-            justify-center rounded-2xl border p-8'
-            >
+            <Link href={`/profile/${user.clerkId}`}>
                 <Image
                     src={user.picture}
                     alt={user.name}
@@ -37,37 +32,35 @@ const UserCard = async ({ user }: UserCardProps) => {
                     height={100}
                     className='rounded-full'
                 />
+            </Link>
 
-                <div className='mt-4 text-center'>
-                    <h3 className='h3-bold text-dark200_light900 line-clamp-1'>
-                        {user.name}
-                    </h3>
-                    <p
-                        className='body-regular
-                    text-dark500_light500
-                     mt-2'
-                    >
-                        @{user.name.toLowerCase()}
-                    </p>
-                </div>
-                <div className='mt-5'>
-                    {interactedTags.length ? (
-                        <div className='flex items-center gap-2'>
-                            {interactedTags.map((tag) => (
-                                <RenderTag
-                                    key={tag._id}
-                                    _id={tag._id}
-                                    name={tag.name}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <Badge>No tags Yet</Badge>
-                    )}
-                </div>
-            </article>
-        </Link>
+            <div className='mt-4 text-center'>
+                <h3 className='h3-bold text-dark200_light900 line-clamp-1'>
+                    {user.name}
+                </h3>
+                <p className='body-regular text-dark500_light500 mt-2'>
+                    @{user.name.toLowerCase()}
+                </p>
+            </div>
+
+            <div className='mt-5'>
+                {interactedTags.length ? (
+                    <div className='flex items-center gap-2'>
+                        {interactedTags.map((tag) => (
+                            <RenderTag
+                                key={tag._id}
+                                _id={tag._id}
+                                name={tag.name}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <Badge>No tags Yet</Badge>
+                )}
+            </div>
+        </article>
     );
 };
+
 
 export default UserCard;
