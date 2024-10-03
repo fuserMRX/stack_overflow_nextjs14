@@ -1,14 +1,16 @@
 'use client';
+import { useEffect } from 'react';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { downvoteAnswer, upvoteAnswer } from '@/lib/actions/answer.action';
+import { viewQuestion } from '@/lib/actions/interaction.action';
 import {
     downvoteQuestion,
     upvoteQuestion,
 } from '@/lib/actions/question.action';
 import { toggleSaveQuestion } from '@/lib/actions/user.action';
 import { formatLargeNumber } from '@/lib/utils';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
 
 interface VotingParams {
     type: string;
@@ -32,7 +34,7 @@ const Voting = ({
     hasSaved,
 }: VotingParams) => {
     const pathName = usePathname();
-    // const router = useRouter();
+    const router = useRouter();
 
     const handleSave = async () => {
         await toggleSaveQuestion({
@@ -85,6 +87,15 @@ const Voting = ({
             }
         }
     };
+
+    useEffect(() => {
+        if (type === 'question') {
+            viewQuestion({
+                questionId: JSON.parse(itemId),
+                userId: userId ? JSON.parse(userId) : undefined,
+            });
+        }
+    }, [type, itemId, userId, pathName, router]);
 
     return (
         <div className='gap-5'>
