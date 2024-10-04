@@ -10,7 +10,6 @@ export async function viewQuestion(params: ViewQuestionParams) {
         await connectToDatabase();
 
         const { questionId, userId } = params;
-        console.log('Viewing question=====================', questionId);
 
         // Update view count for the question
         await Question.findByIdAndUpdate(questionId, { $inc: { views: 1 } });
@@ -23,8 +22,6 @@ export async function viewQuestion(params: ViewQuestionParams) {
             });
 
             if (!existingInteraction) {
-                console.log('CREATING INTERACTION');
-
                 await Interaction.create({
                     user: userId,
                     action: 'view',

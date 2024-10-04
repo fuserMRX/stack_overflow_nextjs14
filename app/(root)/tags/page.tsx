@@ -1,3 +1,5 @@
+import React from 'react';
+
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
 import Filter from '@/components/shared/Filter';
 import { UserFilters } from '@/constants/filters';
