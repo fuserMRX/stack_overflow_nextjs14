@@ -1,17 +1,19 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { auth } from '@clerk/nextjs/server';
+
 import Answer from '@/components/forms/Answer';
 import Metric from '@/components/shared/Metric';
 import ParseHTML from '@/components/shared/ParseHTML';
 import RenderTag from '@/components/shared/RenderTag';
 import { getQuestionById } from '@/lib/actions/question.action';
 import { formatLargeNumber, getTimestamp } from '@/lib/utils';
-import Image from 'next/image';
-import Link from 'next/link';
-import { auth } from '@clerk/nextjs/server';
 import { getUserById } from '@/lib/actions/user.action';
 import AllAnswers from '@/components/shared/AllAnswers';
 import Votes from '@/components/shared/Votes';
+import { URLProps } from '@/types';
 
-const Question = async ({ params, searchParams }: any) => {
+const Question = async ({ params, searchParams }: URLProps) => {
     const result = await getQuestionById({ questionId: params.id });
     const { userId: clerkId } = auth();
 

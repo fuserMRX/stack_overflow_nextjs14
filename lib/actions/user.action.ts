@@ -5,12 +5,13 @@ import User from '@/database/user.model';
 import { connectToDatabase } from '@/lib/mongoose';
 import {
     CreateUserParams, DeleteUserParams,
-    GetAllUsersParams, GetSavedQuestionsParams, ToggleSaveQuestionParams,
+    GetAllUsersParams, GetSavedQuestionsParams, GetUserByIdParams, ToggleSaveQuestionParams,
     UpdateUserParams
 } from '@/lib/actions/shared.types';
 import { revalidatePath } from 'next/cache';
 import Question from '@/database/question.model';
 import Tag from '@/database/tag.model';
+import Answer from '@/database/answer.model';
 
 export async function getUserById(params: any) {
     try {
@@ -80,9 +81,9 @@ export async function deleteUser(params: DeleteUserParams) {
         // TODO: delete user answers, comments, etc.
 
         //  user is deleted two times - redundant!
-        const deletedUser = await User.findByIdAndDelete(user._id);
+        // const deletedUser = await User.findByIdAndDelete(user._id);
 
-        return deletedUser;
+        return user;
 
     } catch (e) {
         console.log(e);
@@ -172,6 +173,32 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
         const { saved } = user || {};
 
         return { questions: saved };
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+export async function getUserInfo(params: GetUserByIdParams) {
+    try {
+        connectToDatabase();
+
+        const { userId } = params;
+        const user = await User.findOne({ clerkId: userId });
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const totalQuestions = await Question.countDocuments({ author: user._id });
+        const totalAnswers = await Answer.countDocuments({ author: user._id });
+
+        return {
+            user,
+            totalQuestions,
+            totalAnswers
+        };
+
     } catch (e) {
         console.log(e);
         throw e;

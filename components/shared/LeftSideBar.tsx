@@ -3,14 +3,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth, SignedOut } from '@clerk/nextjs';
 
 import { sidebarLinks } from '@/constants';
 import { Button } from '@/components/ui/button';
-import { SignedOut } from '@clerk/nextjs';
 
 const LeftSideBar = () => {
     // usePathname causes page to re-render several times sometimes (Profiler shows context change)
     const pathname = usePathname();
+    const { userId } = useAuth();
 
     return (
         <section
@@ -21,6 +22,10 @@ const LeftSideBar = () => {
         >
             <div className='flex flex-1 flex-col gap-6'>
                 {sidebarLinks.map((link) => {
+                    if (link.route === '/profile' && userId) {
+                        link.route = `${link.route}/${userId}`;
+                    }
+
                     const isActive = (pathname === link.route);
 
                     return (
