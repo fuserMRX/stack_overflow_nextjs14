@@ -16,9 +16,11 @@ interface QuestionCardProps {
     views: number;
     answers: object[];
     createdAt: Date;
+    clerkId?: string | null;
 }
 
 const QuestionCard = ({
+    clerkId,
     _id,
     title,
     tags,

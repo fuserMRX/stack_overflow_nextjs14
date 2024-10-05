@@ -5,8 +5,9 @@ import User from '@/database/user.model';
 import { connectToDatabase } from '@/lib/mongoose';
 import {
     CreateUserParams, DeleteUserParams,
-    GetAllUsersParams, GetSavedQuestionsParams, GetUserByIdParams, ToggleSaveQuestionParams,
-    UpdateUserParams
+    GetAllUsersParams, GetSavedQuestionsParams,
+    GetUserByIdParams, GetUserStatsParams,
+    ToggleSaveQuestionParams, UpdateUserParams
 } from '@/lib/actions/shared.types';
 import { revalidatePath } from 'next/cache';
 import Question from '@/database/question.model';
@@ -198,6 +199,26 @@ export async function getUserInfo(params: GetUserByIdParams) {
             totalQuestions,
             totalAnswers
         };
+
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+export async function getUserQuestions(params: GetUserStatsParams) {
+    try {
+        connectToDatabase();
+
+        const { userId, page = 1, pageSize = 10 } = params;
+
+        const totalQuesions = await Question.countDocuments({ author: userId });
+        const userQuestions = await Question.find({ author: userId })
+            .sort({ views: -1, upvotes: -1 })
+            .populate('tags', '_id name')
+            .populate('author', '_id clerkId name picture');
+
+        return { totalQuesions, questions: userQuestions };
 
     } catch (e) {
         console.log(e);

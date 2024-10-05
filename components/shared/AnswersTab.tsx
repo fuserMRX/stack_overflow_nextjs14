@@ -1,9 +1,17 @@
-import React from 'react'
+import { SearchParamsProps } from '@/types';
+import React from 'react';
 
-const AnswersTab = () => {
-  return (
-    <div>AnswersTab</div>
-  )
+interface AnswerTabProps extends SearchParamsProps {
+    userId: string;
+    clerkId: string | null;
 }
+
+const AnswersTab = async ({
+    searchParams,
+    userId,
+    clerkId,
+}: AnswerTabProps) => {
+    return <div>AnswersTab</div>;
+};
 
 export default AnswersTab;
