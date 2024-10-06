@@ -114,13 +114,18 @@ const ProfilePage = async ({ params, searchParams }: URLProps) => {
                     </TabsList>
                     <TabsContent value='top-posts'>
                         <QuestionsTab
-                        searchParams={searchParams}
-                        userId={user._id}
-                        clerkId={clerkId}
+                            searchParams={searchParams}
+                            userId={user._id}
+                            clerkId={clerkId}
                         />
                     </TabsContent>
-                    <TabsContent value='answers'>
-                        <AnswersTab />
+                    <TabsContent value='answers'
+                    className='flex w-full flex-col gap-6'>
+                        <AnswersTab
+                            searchParams={searchParams}
+                            userId={user._id}
+                            clerkId={clerkId}
+                        />
                     </TabsContent>
                 </Tabs>
             </div>
