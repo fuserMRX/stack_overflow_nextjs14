@@ -40,8 +40,8 @@ const AllAnswers = async ({
                     >
                         <div className='flex items-center justify-between'>
                             <div
-                                className='mb-8 flex flex-col-reverse
-                        justify-between gap-5 sm:flex-row sm:items-center sm:gap-2'
+                                className='mb-8 flex w-full flex-col-reverse justify-between gap-5
+                                sm:flex-row sm:items-center sm:gap-2'
                             >
                                 <Link
                                     href={`/profile/${answer.author.clerkId}`}
@@ -49,20 +49,17 @@ const AllAnswers = async ({
                                 >
                                     <Image
                                         src={answer.author.picture}
-                                        width={18}
-                                        height={18}
+                                        width={20}
+                                        height={20}
                                         alt='profile'
-                                        className='rounded-full object-cover max-sm:mt-5'
+                                        className='rounded-full object-cover max-sm:mt-0.5'
                                     />
                                     <div className='flex flex-col sm:flex-row sm:items-center'>
-                                        <p className='body-semibold text-dark300_light700'>
+                                        <p className='body-semibold text-dark300_light700 ml-0.5'>
                                             {answer.author.name}
                                         </p>
-                                        <p
-                                            className='small-regular text-light400_light500
-                                     line-clamp-1'
-                                        >
-                                            <span className='ml-1'>
+                                        <p className='small-regular text-light400_light500 ml-0.5 mt-0.5 line-clamp-1'>
+                                            <span className='ml-0.5'>
                                                 answered
                                             </span>{' '}
                                             {getTimestamp(answer.createdAt)}

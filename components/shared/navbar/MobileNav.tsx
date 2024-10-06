@@ -12,20 +12,23 @@ import {
     SheetTitle,
     SheetDescription,
 } from '@/components/ui/sheet';
-import { SignedOut } from '@clerk/nextjs';
+import { SignedOut, useAuth } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { sidebarLinks } from '@/constants';
 import { usePathname } from 'next/navigation';
 
 const NavContent = () => {
     const pathname = usePathname();
+    const { userId } = useAuth();
 
     return (
         <section className='flex h-full flex-col gap-6 pt-16'>
             {sidebarLinks.map((link) => {
-                const isActive =
-                    (pathname.includes(link.route) && link.route.length) ||
-                    pathname === link.route;
+                if (link.route === '/profile' && userId) {
+                    link.route = `${link.route}/${userId}`;
+                }
+
+                const isActive = pathname === link.route;
 
                 return (
                     <SheetClose asChild key={link.route}>
@@ -63,7 +66,7 @@ const MobileNav = () => {
         <Sheet>
             <SheetTrigger asChild>
                 <Image
-                    src='assets/icons/hamburger.svg'
+                    src='/assets/icons/hamburger.svg'
                     width={36}
                     height={36}
                     alt='Menu'

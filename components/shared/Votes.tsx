@@ -98,7 +98,7 @@ const Voting = ({
     }, [type, itemId, userId, pathName, router]);
 
     return (
-        <div className='gap-5'>
+        <div className='flex gap-5'>
             <div className='flex-center gap-2.5'>
                 {/* upVotes */}
                 <div className='flex-center gap-1.5'>
@@ -109,8 +109,8 @@ const Voting = ({
                                 : '/assets/icons/upvote.svg'
                         }
                         alt='Upvote'
-                        width={16}
-                        height={16}
+                        width={18}
+                        height={18}
                         className='cursor-pointer'
                         onClick={() => handleVote('upvote')}
                     />
@@ -157,8 +157,8 @@ const Voting = ({
                                 : '/assets/icons/star-red.svg'
                         }
                         alt='Star'
-                        width={16}
-                        height={16}
+                        width={18}
+                        height={18}
                         className='cursor-pointer'
                         onClick={handleSave}
                     />
