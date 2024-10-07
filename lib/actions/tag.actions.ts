@@ -6,7 +6,7 @@ import { connectToDatabase } from '@/lib/mongoose';
 import {
     GetAllTagsParams, GetQuestionsByTagIdParams,
     GetTopInteractedTagsParams
-} from './shared.types';
+} from '@/lib/actions/shared.types';
 import User from '@/database/user.model';
 import Tag, { ITag } from '@/database/tag.model';
 import Question from '@/database/question.model';
@@ -65,7 +65,7 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
                 },
                 populate: [
                     { path: 'tags', model: Tag, select: '_id name' },
-                    { path: 'author', model: User, select: '_id name username picture' }
+                    { path: 'author', model: User, select: '_id name username picture clerkId' }
                 ]
             });
 

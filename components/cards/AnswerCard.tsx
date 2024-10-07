@@ -14,7 +14,7 @@ interface AnswerCardProps {
     };
     author: {
         _id: string;
-        clerkId: string;
+        clerkId?: string;
         name: string;
         picture: string;
     };
