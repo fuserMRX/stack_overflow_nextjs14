@@ -21,33 +21,57 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { QuestionsSchema } from '@/lib/validations';
-import { createQuestion } from '@/lib/actions/question.action';
+import { createQuestion, editQuestion } from '@/lib/actions/question.action';
 import { useRouter, usePathname } from 'next/navigation';
 
-const type: any = 'create';
-
 interface QuestionProps {
+    type?: string;
     mongoUserId: string;
+    questionDetails?: string;
 }
 
-const Question = ({ mongoUserId }: QuestionProps) => {
+interface ParsedQuestionDetailsProps {
+    _id: string;
+    title?: string;
+    content?: string;
+    tags?: { name: string }[];
+}
+
+const Question = ({ type, mongoUserId, questionDetails }: QuestionProps) => {
     const { theme } = useTheme();
-    const skin = (theme === 'dark' || theme === 'system') ? 'oxide-dark' : 'oxide';
+    const skin =
+        theme === 'dark' || theme === 'system' ? 'oxide-dark' : 'oxide';
     // eslint-disable-next-line camelcase
-    const content_css = (theme === 'dark' || theme === 'system') ? 'dark' : 'default';
+    const content_css =
+        theme === 'dark' || theme === 'system' ? 'dark' : 'default';
 
     const editorRef = useRef(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const pathName = usePathname();
 
+    let parseQuestionDetails: ParsedQuestionDetailsProps = {
+        _id: '',
+    };
+
+    try {
+        parseQuestionDetails = JSON.parse(
+            questionDetails || ''
+        ) as ParsedQuestionDetailsProps;
+    } catch (error) {
+        console.error(error);
+    }
+
+    const { title, content, tags, _id } = parseQuestionDetails || {};
+    const grouppedTags = tags?.map((tag) => tag.name);
+
     // 1. Define your form.
     const form = useForm<z.infer<typeof QuestionsSchema>>({
         resolver: zodResolver(QuestionsSchema),
         defaultValues: {
-            title: '',
-            explanation: '',
-            tags: [],
+            title: title || '',
+            explanation: content || '',
+            tags: grouppedTags || [],
         },
     });
 
@@ -56,16 +80,27 @@ const Question = ({ mongoUserId }: QuestionProps) => {
         setIsSubmitting(true);
 
         try {
-            // make an async call to the DB -> create a question
-            await createQuestion({
-                title: values.title,
-                content: values.explanation,
-                tags: values.tags,
-                author: JSON.parse(mongoUserId),
-                path: pathName,
-            });
-            // navigate to the home page
-            router.push('/');
+            if (type === 'Edit') {
+                await editQuestion({
+                    questionId: _id,
+                    title: values.title,
+                    content: values.explanation,
+                    path: pathName,
+                });
+
+                router.push(`/question/${_id}`);
+            } else {
+                // make an async call to the DB -> create a question
+                await createQuestion({
+                    title: values.title,
+                    content: values.explanation,
+                    tags: values.tags,
+                    author: JSON.parse(mongoUserId),
+                    path: pathName,
+                });
+                // navigate to the home page
+                router.push('/');
+            }
         } catch (e) {
             console.error(e);
         } finally {
@@ -167,7 +202,7 @@ const Question = ({ mongoUserId }: QuestionProps) => {
                                     }
                                     onBlur={field.onBlur}
                                     onEditorChange={handleEditorChange}
-                                    initialValue=''
+                                    initialValue={content || ''}
                                     init={{
                                         height: 350,
                                         menubar: false,
@@ -220,6 +255,7 @@ const Question = ({ mongoUserId }: QuestionProps) => {
                             <FormControl className='mt-3.5'>
                                 <>
                                     <Input
+                                        disabled={type === 'Edit'}
                                         placeholder='Add tags...'
                                         className='paragraph-regular no-focus
                     placeholder background-light800_dark400 light-border-2
@@ -237,22 +273,18 @@ const Question = ({ mongoUserId }: QuestionProps) => {
                                                 background-light800_dark300 text-light400_light500
                                                 flex items-center justify-center gap-2 rounded-md border-none
                                                 px-4 py-2 capitalize'
-                                                    onClick={() =>
-                                                        handleTagRemove(
-                                                            tag,
-                                                            field
-                                                        )
-                                                    }
+                                                    onClick={() => (type !== 'Edit') ? handleTagRemove(tag,field) : null}
                                                 >
                                                     {tag}
-                                                    <Image
+                                                    {type !== 'Edit' && (
+                                                        <Image
                                                         src='/assets/icons/close.svg'
                                                         alt='close'
                                                         width={12}
                                                         height={12}
-                                                        className='cursor-pointer
-                                                object-contain invert-0 dark:invert'
+                                                        className='cursor-pointer object-contain invert-0 dark:invert'
                                                     />
+                                                    )}
                                                 </Badge>
                                             ))}
                                         </div>
@@ -275,10 +307,10 @@ const Question = ({ mongoUserId }: QuestionProps) => {
                     disabled={isSubmitting}
                 >
                     {isSubmitting ? (
-                        <>{type === 'edit' ? 'Editing...' : 'Posting...'}</>
+                        <>{type === 'Edit' ? 'Editing...' : 'Posting...'}</>
                     ) : (
                         <>
-                            {type === 'edit'
+                            {type === 'Edit'
                                 ? 'Edit Question'
                                 : 'Ask a question'}
                         </>
