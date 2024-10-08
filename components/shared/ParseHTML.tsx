@@ -27,7 +27,7 @@ import 'prismjs/plugins/line-numbers/prism-line-numbers.js';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
 interface ParseHTMLProps {
-    data: string;
+    data: string | undefined;
 }
 
 const ParseHTML = ({ data }: ParseHTMLProps) => {
