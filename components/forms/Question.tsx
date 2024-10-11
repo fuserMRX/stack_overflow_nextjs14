@@ -54,13 +54,15 @@ const Question = ({ type, mongoUserId, questionDetails }: QuestionProps) => {
         _id: '',
     };
 
-    try {
-        parseQuestionDetails = JSON.parse(
-            questionDetails || ''
-        ) as ParsedQuestionDetailsProps;
-    } catch (error) {
-        console.error(error);
-    }
+    if (questionDetails && questionDetails.trim() !== '') {
+        try {
+            parseQuestionDetails = JSON.parse(
+                questionDetails
+            ) as ParsedQuestionDetailsProps;
+        } catch (error) {
+            console.error('Error parsing questionDetails:', error);
+        }
+    } 
 
     const { title, content, tags, _id } = parseQuestionDetails || {};
     const grouppedTags = tags?.map((tag) => tag.name);
