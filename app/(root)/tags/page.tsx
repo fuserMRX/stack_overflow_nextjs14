@@ -1,14 +1,17 @@
 import React from 'react';
+import Link from 'next/link';
 
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
 import Filter from '@/components/shared/Filter';
 import { UserFilters } from '@/constants/filters';
 import NoResult from '@/components/shared/NoResult';
 import { getAllTags } from '@/lib/actions/tag.actions';
-import Link from 'next/link';
+import { SearchParamsProps } from '@/types';
 
-const Tags = async () => {
-    const result = await getAllTags({});
+const Tags = async ({ searchParams }: SearchParamsProps) => {
+    const result = await getAllTags({
+        searchQuery: searchParams.q,
+    });
 
     return (
         <>
