@@ -9,9 +9,12 @@ import HomeFilters from '@/components/home/HomeFilters';
 import NoResult from '@/components/shared/NoResult';
 import QuestionCard from '@/components/cards/QuestionCard';
 import { getQuestions } from '@/lib/actions/question.action';
+import { SearchParamsProps } from '@/types';
 
-const Home = async () => {
-    const { questions } = await getQuestions({});
+const Home = async ({ searchParams }: SearchParamsProps) => {
+    const { questions } = await getQuestions({
+        searchQuery: searchParams.q,
+    });
 
     return (
         <>

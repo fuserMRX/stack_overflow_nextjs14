@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { FilterQuery } from 'mongoose';
 
 import Question from '@/database/question.model';
 import Tag from '@/database/tag.model';
@@ -18,8 +19,18 @@ export async function getQuestions(params: GetQuestionsParams) {
     try {
         connectToDatabase();
 
+        const { searchQuery } = params;
+        const query: FilterQuery<typeof Question> = {};
+
+        if (searchQuery) {
+            query.$or = [
+                { title: { $regex: new RegExp(searchQuery, 'i') } },
+                { content: { $regex: new RegExp(searchQuery, 'i') } },
+            ];
+        }
+
         // populate because we want to get the tags and author details
-        const questions = await Question.find({})
+        const questions = await Question.find(query)
             .populate({ path: 'tags', model: Tag })
             .populate({ path: 'author', model: User })
             .sort({ createdAt: -1 });
