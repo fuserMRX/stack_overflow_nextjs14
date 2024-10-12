@@ -39,8 +39,6 @@ const LocalSearchBar = ({
                     value: search,
                 });
 
-                console.log('newUrl', newUrl);
-
                 router.push(newUrl, { scroll: false });
             } else {
                 if (pathname === route) {
@@ -77,9 +75,9 @@ const LocalSearchBar = ({
                 value={search}
                 placeholder={placeholder}
                 onChange={(e) => setSearch(e.target.value)}
-                className='paragraph-regular no-focus placeholder 
+                className={`paragraph-regular no-focus ${search ? '' : 'placeholder'}
                     background-light800_darkgradient border-none
-                    shadow-none outline-none'
+                    shadow-none outline-none`}
             />
 
             {iconPosition === 'right' && (
