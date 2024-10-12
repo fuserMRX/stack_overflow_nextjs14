@@ -7,8 +7,9 @@ import { QuestionFilters } from '@/constants/filters';
 import NoResult from '@/components/shared/NoResult';
 import QuestionCard from '@/components/cards/QuestionCard';
 import { getSavedQuestions } from '@/lib/actions/user.action';
+import { SearchParamsProps } from '@/types';
 
-const Collection = async () => {
+const Collection = async ({ searchParams }: SearchParamsProps) => {
     const { userId: clerkId } = auth();
 
     if (!clerkId) {
@@ -17,6 +18,7 @@ const Collection = async () => {
 
     const { questions } = await getSavedQuestions({
         clerkId,
+        searchQuery: searchParams.q,
     });
 
     return (
@@ -27,7 +29,7 @@ const Collection = async () => {
             max-sm:flex-col sm:items-center'
             >
                 <LocalSearchBar
-                    route='/'
+                    route='/collection'
                     iconPosition='left'
                     imgSrc='/assets/icons/search.svg'
                     placeholder='Search for saved questions'
