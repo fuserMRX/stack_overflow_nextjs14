@@ -39,7 +39,7 @@ const UserCard = async ({ user }: UserCardProps) => {
                     {user.name}
                 </h3>
                 <p className='body-regular text-dark500_light500 mt-2'>
-                    @{user.name.toLowerCase()}
+                    @{user.username ? user.username.toLowerCase() : user.name.toLowerCase()}
                 </p>
             </div>
 
