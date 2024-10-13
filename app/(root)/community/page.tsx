@@ -11,6 +11,7 @@ import { SearchParamsProps } from '@/types';
 const Community = async ({ searchParams }: SearchParamsProps) => {
     const result = await getAllUsers({
         searchQuery: searchParams.q,
+        filter: searchParams.filter,
     });
 
     return (
@@ -39,8 +40,10 @@ const Community = async ({ searchParams }: SearchParamsProps) => {
                         <UserCard key={user._id} user={user} />
                     ))
                 ) : (
-                    <div className='paragraph-regular text-dark200_light800
-                    mx-auto max-w-4xl text-center'>
+                    <div
+                        className='paragraph-regular text-dark200_light800
+                    mx-auto max-w-4xl text-center'
+                    >
                         <p>No users found</p>
                         <Link
                             href='/sign-up'
