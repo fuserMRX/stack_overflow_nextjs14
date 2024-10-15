@@ -10,11 +10,13 @@ import NoResult from '@/components/shared/NoResult';
 import QuestionCard from '@/components/cards/QuestionCard';
 import { getQuestions } from '@/lib/actions/question.action';
 import { SearchParamsProps } from '@/types';
+import Pagination from '@/components/shared/Pagination';
 
 const Home = async ({ searchParams }: SearchParamsProps) => {
-    const { questions } = await getQuestions({
+    const { questions, isNext } = await getQuestions({
         searchQuery: searchParams.q,
         filter: searchParams.filter,
+        page: searchParams.page ? +searchParams.page : 1,
     });
 
     // Fetch Recommended Questions
@@ -60,18 +62,19 @@ const Home = async ({ searchParams }: SearchParamsProps) => {
 
             <div className='mt-10 flex w-full flex-col gap-6'>
                 {questions?.length ? (
-                    questions.map((question) =>
-                    <QuestionCard
-                        key={question._id}
-                        _id={question._id}
-                        title={question.title}
-                        tags={question.tags}
-                        author={question.author}
-                        upvotes={question.upvotes}
-                        views={question.views}
-                        answers={question.answers}
-                        createdAt={question.createdAt}
-                    />)
+                    questions.map((question) => (
+                        <QuestionCard
+                            key={question._id}
+                            _id={question._id}
+                            title={question.title}
+                            tags={question.tags}
+                            author={question.author}
+                            upvotes={question.upvotes}
+                            views={question.views}
+                            answers={question.answers}
+                            createdAt={question.createdAt}
+                        />
+                    ))
                 ) : (
                     <NoResult
                         title='There is no questions to show'
@@ -80,6 +83,13 @@ const Home = async ({ searchParams }: SearchParamsProps) => {
                         linkTitle='Ask a Question'
                     />
                 )}
+            </div>
+
+            <div className='mt-10'>
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={isNext}
+                />
             </div>
         </>
     );
