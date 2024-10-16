@@ -80,3 +80,9 @@ export const removeKeysFromQuery = ({ params, keysToRemove }: RemoveUrlQueryPara
         query: currentUrl,
     }, { skipNull: true });
 }
+
+export const validatePageNumber = (page: any) => {
+    const pageNumber = Number(page);
+
+    return Number.isInteger(pageNumber) && pageNumber > 0 ? pageNumber : 1;
+}

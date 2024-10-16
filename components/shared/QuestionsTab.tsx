@@ -1,6 +1,7 @@
+import React from 'react';
+
 import { getUserQuestions } from '@/lib/actions/user.action';
 import { SearchParamsProps } from '@/types';
-import React from 'react';
 import QuestionCard from '@/components/cards/QuestionCard';
 import Pagination from '@/components/shared/Pagination';
 
