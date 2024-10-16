@@ -36,7 +36,7 @@ export async function getAnswers(params: GetAnswersParams) {
     try {
         connectToDatabase();
 
-        const { questionId, sortBy, page = 1, pageSize = 1 } = params;
+        const { questionId, sortBy, page = 1, pageSize = 5 } = params;
 
         // Calculate the number of posts to skip based on the page
         // number and page size (number of posts per page)
