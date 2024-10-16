@@ -5,11 +5,12 @@ import NoResult from '@/components/shared/NoResult';
 import { getQuestionsByTagId } from '@/lib/actions/tag.actions';
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
 import { URLProps } from '@/types';
+import Pagination from '@/components/shared/Pagination';
 
 const TagDetailsPage = async ({ params, searchParams }: URLProps) => {
-    const { tagTitle, questions } = await getQuestionsByTagId({
+    const { tagTitle, questions, isNext } = await getQuestionsByTagId({
         tagId: params.id,
-        page: 1,
+        page: searchParams.page ? +searchParams.page : 1,
         searchQuery: searchParams.q,
     });
 
@@ -49,6 +50,13 @@ const TagDetailsPage = async ({ params, searchParams }: URLProps) => {
                         linkTitle='Ask a Question'
                     />
                 )}
+            </div>
+
+            <div className='mt-10'>
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={isNext}
+                />
             </div>
         </>
     );

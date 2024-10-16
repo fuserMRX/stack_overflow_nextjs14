@@ -1,13 +1,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import ParseHTML from './ParseHTML';
 
+import ParseHTML from '@/components/shared/ParseHTML';
 import Filter from '@/components/shared/Filter';
 import { AnswerFilters } from '@/constants/filters';
 import { getAnswers } from '@/lib/actions/answer.action';
 import { getTimestamp } from '@/lib/utils';
 import Votes from '@/components/shared/Votes';
+import Pagination from '@/components/shared/Pagination';
 
 interface AllAnswersProps {
     questionId: string;
@@ -26,7 +27,7 @@ const AllAnswers = async ({
 }: AllAnswersProps) => {
     const results = await getAnswers({
         questionId,
-        page: page || 1,
+        page: page ? +page : 1,
         sortBy: filter
     });
 
@@ -91,6 +92,14 @@ const AllAnswers = async ({
                     </article>
                 ))}
             </div>
+
+            <div className='mt-10'>
+                <Pagination
+                    pageNumber={page ? +page : 1}
+                    isNext={results.isNext}
+                />
+            </div>
+
         </div>
     );
 };

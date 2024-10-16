@@ -95,10 +95,15 @@ export async function deleteUser(params: DeleteUserParams) {
 export async function getAllUsers(params: GetAllUsersParams) {
     try {
         connectToDatabase();
-        const { searchQuery, filter } = params;
+        const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+
+        // Calculate the number of posts to skip based on the page
+        // number and page size (number of posts per page)
+        const skipAmount = (page - 1) * pageSize;
+
         const query: FilterQuery<typeof User> = {};
 
-        if(searchQuery) {
+        if (searchQuery) {
             query.$or = [
                 { name: { $regex: new RegExp(searchQuery, 'i') } },
                 { username: { $regex: new RegExp(searchQuery, 'i') } },
@@ -107,7 +112,7 @@ export async function getAllUsers(params: GetAllUsersParams) {
 
         let sortOptions = {};
 
-        switch(filter) {
+        switch (filter) {
             case 'new_users':
                 sortOptions = { joinedAt: -1 };
                 break;
@@ -122,9 +127,14 @@ export async function getAllUsers(params: GetAllUsersParams) {
         }
 
         const users = await User.find(query)
+            .skip(skipAmount)
+            .limit(pageSize)
             .sort(sortOptions);
 
-        return { users };
+        const totalUsers = await User.countDocuments(query);
+        const isNext = totalUsers > (skipAmount + users.length);
+
+        return { users, isNext };
     } catch (e) {
         console.log(e);
         throw e;
@@ -170,7 +180,11 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
     try {
         connectToDatabase();
 
-        const { clerkId, searchQuery, filter } = params;
+        const { clerkId, searchQuery, filter, page = 1, pageSize = 10 } = params;
+
+        // Calculate the number of posts to skip based on the page
+        // number and page size (number of posts per page)
+        const skipAmount = (page - 1) * pageSize;
 
         const query: FilterQuery<typeof Question> = searchQuery
             ? { title: { $regex: new RegExp(searchQuery, 'i') } }
@@ -178,7 +192,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
 
         let sortOptions = {};
 
-        switch(filter) {
+        switch (filter) {
             case 'most_recent':
                 sortOptions = { createdAt: -1 };
                 break;
@@ -204,6 +218,8 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
                 match: query,
                 options: {
                     sort: sortOptions,
+                    skip: skipAmount,
+                    limit: pageSize + 1
                 },
                 populate: [
                     { path: 'tags', model: Tag, select: '_id name' },
@@ -217,7 +233,13 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
 
         const { saved } = user || {};
 
-        return { questions: saved };
+        const isNext = saved.length > pageSize;
+
+        if (isNext) {
+            saved.splice(pageSize, 1);
+        }
+
+        return { questions: saved, isNext };
     } catch (e) {
         console.log(e);
         throw e;
@@ -254,15 +276,23 @@ export async function getUserQuestions(params: GetUserStatsParams) {
     try {
         connectToDatabase();
 
-        const { userId, page = 1, pageSize = 10 } = params;
+        const { userId, page = 1, pageSize = 1 } = params;
+
+        // Calculate the number of posts to skip based on the page
+        // number and page size (number of posts per page)
+        const skipAmount = (page - 1) * pageSize;
 
         const totalQuesions = await Question.countDocuments({ author: userId });
         const userQuestions = await Question.find({ author: userId })
+            .skip(skipAmount)
+            .limit(pageSize)
             .sort({ views: -1, upvotes: -1 })
             .populate('tags', '_id name')
             .populate('author', '_id clerkId name picture');
 
-        return { totalQuesions, questions: userQuestions };
+        const isNext = totalQuesions > (skipAmount + userQuestions.length);
+
+        return { totalQuesions, questions: userQuestions, isNext };
 
     } catch (e) {
         console.log(e);
@@ -274,16 +304,23 @@ export async function getUserAnswers(params: GetUserStatsParams) {
     try {
         connectToDatabase();
 
-        const { userId, page = 1, pageSize = 10 } = params;
+        const { userId, page = 1, pageSize = 5 } = params;
+
+        // Calculate the number of posts to skip based on the page
+        // number and page size (number of posts per page)
+        const skipAmount = (page - 1) * pageSize;
 
         const totalAnswers = await Answer.countDocuments({ author: userId });
         const userAnswers = await Answer.find({ author: userId })
+            .skip(skipAmount)
+            .limit(pageSize)
             .sort({ views: -1, upvotes: -1 })
             .populate('question', '_id title')
             .populate('author', '_id clerkId name picture');
 
-        return { totalAnswers, answers: userAnswers };
+        const isNext = totalAnswers > (skipAmount + userAnswers.length);
 
+        return { totalAnswers, answers: userAnswers, isNext };
     } catch (e) {
         console.log(e);
         throw e;

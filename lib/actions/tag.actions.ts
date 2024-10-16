@@ -36,7 +36,12 @@ export async function getAllTags(params: GetAllTagsParams) {
     try {
         connectToDatabase();
 
-        const { searchQuery, filter } = params;
+        const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+
+        // Calculate the number of posts to skip based on the page
+        // number and page size (number of posts per page)
+        const skipAmount = (page - 1) * pageSize;
+
         const query: FilterQuery<typeof Tag> = {};
 
         if (searchQuery) {
@@ -65,9 +70,14 @@ export async function getAllTags(params: GetAllTagsParams) {
         }
 
         const tags = await Tag.find(query)
+            .skip(skipAmount)
+            .limit(pageSize)
             .sort(sortOptions);
 
-        return { tags };
+        const totalUsers = await Tag.countDocuments(query);
+        const isNext = totalUsers > (skipAmount + tags.length);
+
+        return { tags, isNext };
     } catch (e) {
         console.log(e);
         throw e;
@@ -78,7 +88,11 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
     try {
         connectToDatabase();
 
-        const { tagId, searchQuery } = params;
+        const { tagId, searchQuery, page = 1, pageSize = 10 } = params;
+
+        // Calculate the number of posts to skip based on the page
+        // number and page size (number of posts per page)
+        const skipAmount = (page - 1) * pageSize;
 
         const tagFilter: FilterQuery<ITag> = { _id: tagId };
 
@@ -94,6 +108,8 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
                     : {},
                 options: {
                     sort: { createdAt: -1 },
+                    skip: skipAmount,
+                    limit: pageSize + 1 // +1 to check if there are more questions
                 },
                 populate: [
                     { path: 'tags', model: Tag, select: '_id name' },
@@ -106,8 +122,14 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
         }
 
         const { questions } = tag || {};
+        const isNext = questions.length > pageSize;
 
-        return { tagTitle: tag.name, questions };
+        // Modify the Proxy array in-place using splice to remove the extra item
+        if (isNext) {
+            questions.splice(pageSize, 1);  // Remove the extra item beyond the pageSize
+        }
+
+        return { tagTitle: tag.name, questions, isNext };
     } catch (e) {
         console.log(e);
         throw e;
