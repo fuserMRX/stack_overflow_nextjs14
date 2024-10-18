@@ -1,8 +1,51 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
 import { Input } from '@/components/ui/input';
+import { formUrlQuery, removeKeysFromQuery } from '@/lib/utils';
+import GlobalResult from '@/components/shared/search/GlobalResult';
 
 const GlobalSearch = () => {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const query = searchParams.get('q') || '';
+
+    const [search, setSearch] = useState(query || '');
+    const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (search) {
+                const newUrl = formUrlQuery({
+                    params: searchParams.toString(),
+                    key: 'global',
+                    value: search,
+                });
+
+                router.push(newUrl, { scroll: false });
+            } else {
+                // Dont'd do local and global search at the same time
+                // It means that local will stay active even after reloading the page
+                // but global will be cleared if we clear the search input
+                if (query) {
+                    const newUrl = removeKeysFromQuery({
+                        params: searchParams.toString(),
+                        keysToRemove: ['global', 'type'],
+                    });
+
+                    router.push(newUrl, { scroll: false });
+                }
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [search, searchParams, router, pathname, query]);
+
     return (
         <div className='relative w-full max-w-[600px] max-lg:hidden'>
             <div
@@ -18,12 +61,25 @@ const GlobalSearch = () => {
                 />
                 <Input
                     type='text'
+                    value={search}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+
+                        if (e.target.value) {
+                            setIsOpen(true);
+                        }
+
+                        if (isOpen && e.target.value === '') {
+                            setIsOpen(false);
+                        }
+                    }}
                     placeholder='Search globally'
-                    className='paragraph-regular no-focus
-                    placeholder background-light800_darkgradient border-none
-                    shadow-none outline-none'
+                    className={`paragraph-regular no-focus
+                    ${search ? '' : 'placeholder'} background-light800_darkgradient
+                    text-dark400_light700 border-none shadow-none outline-none`}
                 />
             </div>
+            {isOpen && <GlobalResult />}
         </div>
     );
 };
