@@ -14,8 +14,9 @@ const GlobalSearch = () => {
     const searchParams = useSearchParams();
 
     const query = searchParams.get('q') || '';
+    const globalQuery = searchParams.get('global') || '';
 
-    const [search, setSearch] = useState(query || '');
+    const [search, setSearch] = useState(globalQuery || '');
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
