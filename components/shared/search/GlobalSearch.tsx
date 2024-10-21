@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
@@ -12,12 +12,40 @@ const GlobalSearch = () => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const searchContainerRef = useRef(null);
+    const listenerAdded = useRef(false); // Ref to track listener
 
     const query = searchParams.get('q') || '';
     const globalQuery = searchParams.get('global') || '';
 
     const [search, setSearch] = useState(globalQuery || '');
     const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        const handleOutsideClick = (e: any) => {
+            if (
+                searchContainerRef.current &&
+                // @ts-ignore
+                !searchContainerRef.current.contains(e.target)
+            ) {
+                setIsOpen(false);
+                setSearch('');
+            }
+        };
+
+        setIsOpen(false); // Close the dropdown on route change
+
+        // Only add the listener if it hasn't been added already
+        if (!listenerAdded.current) {
+            document.addEventListener('click', handleOutsideClick);
+            listenerAdded.current = true; // Mark listener as added
+        }
+
+        return () => {
+            document.removeEventListener('click', handleOutsideClick);
+            listenerAdded.current = false; // Reset listener tracking on cleanup
+        };
+    }, [pathname]);
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -48,7 +76,8 @@ const GlobalSearch = () => {
     }, [search, searchParams, router, pathname, query]);
 
     return (
-        <div className='relative w-full max-w-[600px] max-lg:hidden'>
+        <div className='relative w-full max-w-[600px] max-lg:hidden'
+        ref={searchContainerRef}>
             <div
                 className='background-light800_darkgradient relative flex min-h-[56px]
             grow items-center gap-1 rounded-xl px-4'
