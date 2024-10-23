@@ -15,7 +15,7 @@ import { formatLargeNumber } from '@/lib/utils';
 interface VotingParams {
     type: string;
     itemId: string;
-    userId: string;
+    userId?: string;
     upvotes: number;
     downvotes: number;
     hasupVoted: boolean;
@@ -37,11 +37,13 @@ const Voting = ({
     const router = useRouter();
 
     const handleSave = async () => {
-        await toggleSaveQuestion({
-            userId: JSON.parse(userId),
-            questionId: JSON.parse(itemId),
-            path: pathName,
-        });
+        if (userId) {
+            await toggleSaveQuestion({
+                userId: JSON.parse(userId),
+                questionId: JSON.parse(itemId),
+                path: pathName,
+            });
+        }
     };
 
     const handleVote = async (action: string) => {

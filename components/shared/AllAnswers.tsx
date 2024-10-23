@@ -12,7 +12,7 @@ import Pagination from '@/components/shared/Pagination';
 
 interface AllAnswersProps {
     questionId: string;
-    userId: string;
+    userId?: string;
     totalAnswers: number;
     page?: number;
     filter?: string;
@@ -75,7 +75,7 @@ const AllAnswers = async ({
                                     <Votes
                                         type='answer'
                                         itemId={JSON.stringify(answer._id)}
-                                        userId={JSON.stringify(userId)}
+                                        userId={userId && JSON.stringify(userId)}
                                         upvotes={answer.upvotes.length}
                                         downvotes={answer.downvotes.length}
                                         hasupVoted={answer.upvotes.includes(

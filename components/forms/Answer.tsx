@@ -22,7 +22,7 @@ import { usePathname } from 'next/navigation';
 interface AnswerProps {
     question: string;
     questionId: string;
-    authorId: string;
+    authorId?: string;
 }
 
 const Answer = ({ question, questionId, authorId }: AnswerProps) => {
@@ -44,27 +44,32 @@ const Answer = ({ question, questionId, authorId }: AnswerProps) => {
     });
 
     const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
-        setIsSubmitting(true);
+        if (authorId) {
+            setIsSubmitting(true);
 
-        try {
-            await createAnswer({
-                content: values.answer,
-                author: JSON.parse(authorId),
-                question: JSON.parse(questionId),
-                path: pathname,
-            });
+            try {
+                await createAnswer({
+                    content: values.answer,
+                    author: JSON.parse(authorId),
+                    question: JSON.parse(questionId),
+                    path: pathname,
+                });
 
-            form.reset();
+                form.reset();
 
-            if (editorRef.current) {
-                // @ts-ignore
-                // { format: 'html', no_events: true } => prevents validation trigger after cleaning the content
-                editorRef.current.setContent('', { format: 'html', no_events: true });
+                if (editorRef.current) {
+                    // @ts-ignore
+                    // { format: 'html', no_events: true } => prevents validation trigger after cleaning the content
+                    editorRef.current.setContent('', {
+                        format: 'html',
+                        no_events: true,
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsSubmitting(false);
             }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
