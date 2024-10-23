@@ -170,9 +170,9 @@ const Question = ({ type, mongoUserId, questionDetails }: QuestionProps) => {
                             </FormLabel>
                             <FormControl className='mt-3.5'>
                                 <Input
-                                    className='paragraph-regular no-focus
-                    placeholder background-light800_dark400 light-border-2
-                    text-dark300_light700 min-h-[46px] border'
+                                    className={`paragraph-regular no-focus
+                    ${field.value ? '' : 'placeholder'} background-light800_dark400 light-border-2
+                    text-dark300_light700 min-h-[46px] border`}
                                     {...field}
                                 />
                             </FormControl>
