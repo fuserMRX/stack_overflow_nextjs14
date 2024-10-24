@@ -8,6 +8,7 @@ import { getAllUsers } from '@/lib/actions/user.action';
 import UserCard from '@/components/cards/UserCard';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+import Loading from './loading';
 
 const Community = async ({ searchParams }: SearchParamsProps) => {
     const result = await getAllUsers({
