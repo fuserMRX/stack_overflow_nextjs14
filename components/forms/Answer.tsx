@@ -1,23 +1,24 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { usePathname } from 'next/navigation';
+import { Editor } from '@tinymce/tinymce-react';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
+
 import {
     Form,
     FormControl,
     FormField,
     FormItem,
     FormMessage,
-} from '../ui/form';
-import { useForm } from 'react-hook-form';
+} from '@/components/ui/form';
 import { AnswerSchema } from '@/lib/validations';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Editor } from '@tinymce/tinymce-react';
-import { useTheme } from 'next-themes';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { createAnswer } from '@/lib/actions/answer.action';
-import { usePathname } from 'next/navigation';
 
 interface AnswerProps {
     question: string;
@@ -28,6 +29,7 @@ interface AnswerProps {
 const Answer = ({ question, questionId, authorId }: AnswerProps) => {
     const pathname = usePathname();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmittingAI, setIsSubmittingAI] = useState(false);
     const { theme } = useTheme();
     const skin =
         theme === 'dark' || theme === 'system' ? 'oxide-dark' : 'oxide';
@@ -78,6 +80,36 @@ const Answer = ({ question, questionId, authorId }: AnswerProps) => {
         form.trigger('answer'); // Manually trigger validation for explanation
     };
 
+    const generateAIAnswer = async () => {
+        if (!authorId) return;
+
+        setIsSubmittingAI(true);
+
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ question }),
+                }
+            );
+
+            const aiAnswer = await response.json();
+            const formattedAnwer = aiAnswer.reply.replace(/\n/g, '<br />');
+
+            if (editorRef.current) {
+                // @ts-ignore
+                editorRef.current.setContent(formattedAnwer);
+            }
+
+            // Toast ...
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsSubmittingAI(false);
+        }
+    };
+
     return (
         <div>
             <div
@@ -91,16 +123,24 @@ const Answer = ({ question, questionId, authorId }: AnswerProps) => {
                 <Button
                     className='btn light-border-2 gap-1.5 rounded-md
                 px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500'
-                    onClick={() => {}}
+                onClick={generateAIAnswer}
                 >
-                    <Image
+                    {isSubmittingAI ? (
+                        <>
+                            Generating ...
+                        </>
+                    ): (
+                        <>
+                        <Image
                         src='/assets/icons/stars.svg'
                         alt='AI icon'
                         width={12}
                         height={12}
                         className='object-contain'
                     />
-                    Generate an AI Answer
+                        Generate an AI Answer
+                    </>
+                    )}
                 </Button>
             </div>
 
