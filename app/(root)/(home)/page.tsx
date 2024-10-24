@@ -11,6 +11,7 @@ import QuestionCard from '@/components/cards/QuestionCard';
 import { getQuestions } from '@/lib/actions/question.action';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+import Loading from './loading';
 
 const Home = async ({ searchParams }: SearchParamsProps) => {
     const { questions, isNext } = await getQuestions({
@@ -20,6 +21,9 @@ const Home = async ({ searchParams }: SearchParamsProps) => {
     });
 
     // Fetch Recommended Questions
+
+    const isLoading = true;
+    if(isLoading) return <Loading />
 
     return (
         <>
