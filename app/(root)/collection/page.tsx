@@ -1,5 +1,6 @@
 import React from 'react';
 import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
 import Filter from '@/components/shared/Filter';
@@ -14,7 +15,7 @@ const Collection = async ({ searchParams }: SearchParamsProps) => {
     const { userId: clerkId } = auth();
 
     if (!clerkId) {
-        return null;
+        redirect('/sign-in');
     }
 
     const { questions, isNext } = await getSavedQuestions({

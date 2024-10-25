@@ -19,6 +19,7 @@ import {
 import { AnswerSchema } from '@/lib/validations';
 import { Button } from '@/components/ui/button';
 import { createAnswer } from '@/lib/actions/answer.action';
+import { toast } from '@/hooks/use-toast';
 
 interface AnswerProps {
     question: string;
@@ -46,32 +47,37 @@ const Answer = ({ question, questionId, authorId }: AnswerProps) => {
     });
 
     const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
-        if (authorId) {
-            setIsSubmitting(true);
+        if (!authorId) {
+            return toast({
+                title: 'Please login to answer',
+                description: 'You need to be logged in to answer',
+            });
+        }
 
-            try {
-                await createAnswer({
-                    content: values.answer,
-                    author: JSON.parse(authorId),
-                    question: JSON.parse(questionId),
-                    path: pathname,
+        setIsSubmitting(true);
+
+        try {
+            await createAnswer({
+                content: values.answer,
+                author: JSON.parse(authorId),
+                question: JSON.parse(questionId),
+                path: pathname,
+            });
+
+            form.reset();
+
+            if (editorRef.current) {
+                // @ts-ignore
+                // { format: 'html', no_events: true } => prevents validation trigger after cleaning the content
+                editorRef.current.setContent('', {
+                    format: 'html',
+                    no_events: true,
                 });
-
-                form.reset();
-
-                if (editorRef.current) {
-                    // @ts-ignore
-                    // { format: 'html', no_events: true } => prevents validation trigger after cleaning the content
-                    editorRef.current.setContent('', {
-                        format: 'html',
-                        no_events: true,
-                    });
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsSubmitting(false);
             }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -81,7 +87,12 @@ const Answer = ({ question, questionId, authorId }: AnswerProps) => {
     };
 
     const generateAIAnswer = async () => {
-        if (!authorId) return;
+        if (!authorId) {
+            return toast({
+                title: 'Please login to generate AI answer',
+                description: 'You need to be logged in to generate AI answer',
+            });
+        }
 
         setIsSubmittingAI(true);
 
@@ -123,23 +134,21 @@ const Answer = ({ question, questionId, authorId }: AnswerProps) => {
                 <Button
                     className='btn light-border-2 gap-1.5 rounded-md
                 px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500'
-                onClick={generateAIAnswer}
+                    onClick={generateAIAnswer}
                 >
                     {isSubmittingAI ? (
+                        <>Generating ...</>
+                    ) : (
                         <>
-                            Generating ...
+                            <Image
+                                src='/assets/icons/stars.svg'
+                                alt='AI icon'
+                                width={12}
+                                height={12}
+                                className='object-contain'
+                            />
+                            Generate an AI Answer
                         </>
-                    ): (
-                        <>
-                        <Image
-                        src='/assets/icons/stars.svg'
-                        alt='AI icon'
-                        width={12}
-                        height={12}
-                        className='object-contain'
-                    />
-                        Generate an AI Answer
-                    </>
                     )}
                 </Button>
             </div>
