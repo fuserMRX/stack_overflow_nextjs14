@@ -10,6 +10,11 @@ import QuestionCard from '@/components/cards/QuestionCard';
 import { getSavedQuestions } from '@/lib/actions/user.action';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Collection | Dev Solutions',
+};
 
 const Collection = async ({ searchParams }: SearchParamsProps) => {
     const { userId: clerkId } = auth();

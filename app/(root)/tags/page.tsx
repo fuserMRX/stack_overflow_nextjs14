@@ -8,6 +8,11 @@ import NoResult from '@/components/shared/NoResult';
 import { getAllTags } from '@/lib/actions/tag.actions';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Tags | Dev Solutions',
+};
 
 const Tags = async ({ searchParams }: SearchParamsProps) => {
     const result = await getAllTags({

@@ -12,6 +12,11 @@ import { getUserById } from '@/lib/actions/user.action';
 import AllAnswers from '@/components/shared/AllAnswers';
 import Votes from '@/components/shared/Votes';
 import { URLProps } from '@/types';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Question | Dev Solutions',
+};
 
 const Question = async ({ params, searchParams }: URLProps) => {
     const result = await getQuestionById({ questionId: params.id });

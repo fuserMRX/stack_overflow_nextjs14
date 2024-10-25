@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 import { Button } from '@/components/ui/button';
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
@@ -11,6 +12,10 @@ import QuestionCard from '@/components/cards/QuestionCard';
 import { getQuestions } from '@/lib/actions/question.action';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+
+export const metadata: Metadata = {
+    title: 'Home | Dev Solutions',
+};
 
 const Home = async ({ searchParams }: SearchParamsProps) => {
     const { questions, isNext } = await getQuestions({

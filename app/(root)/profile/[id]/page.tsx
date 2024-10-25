@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SignedIn } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 import { URLProps } from '@/types';
 import { getUserInfo } from '@/lib/actions/user.action';
@@ -13,9 +14,19 @@ import ProfileLink from '@/components/shared/ProfileLink';
 import Stats from '@/components/shared/Stats';
 import QuestionsTab from '@/components/shared/QuestionsTab';
 import AnswersTab from '@/components/shared/AnswersTab';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Profile | Dev Solutions',
+};
 
 const ProfilePage = async ({ params, searchParams }: URLProps) => {
     const { userId: clerkId } = auth();
+
+    if (!clerkId) {
+        redirect('/sign-in');
+    }
+
     const { user, totalQuestions, totalAnswers, badgeCounts, reputation } =
         (await getUserInfo({ userId: params.id })) || {};
 
