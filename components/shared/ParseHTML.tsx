@@ -51,7 +51,7 @@ const ParseHTML = ({ data }: ParseHTMLProps) => {
         return null;
     }
 
-    return <div className='markdown w-full min-w-full' ref={ref}>{parse(data)}</div>;
+    return <div className='markdown w-full min-w-full' ref={ref}>{parse(data || '')}</div>;
 };
 
 export default ParseHTML;
