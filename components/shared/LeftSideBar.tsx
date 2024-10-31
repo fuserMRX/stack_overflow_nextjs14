@@ -28,6 +28,10 @@ const LeftSideBar = () => {
 
                     const isActive = (pathname === link.route);
 
+                    if (link.route === '/profile' && !userId) {
+                        return null;
+                    }
+
                     return (
                         <Link
                             key={link.route}
