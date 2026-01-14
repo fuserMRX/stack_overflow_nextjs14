@@ -24,10 +24,38 @@ const isBotSensitiveRoute = createRouteMatcher([
 const botUserAgentRegex =
     /bot|crawler|spider|crawl|slurp|curl|wget|python-requests|httpclient|libwww|scrapy|axios|go-http-client|java|okhttp|wordpress|ahrefs|semrush|mj12bot|dotbot|yandex|bingbot|googlebot|duckduckbot|baiduspider|sogou|facebookexternalhit|facebot|ia_archiver|bitlybot|skypeuripreview|pinterest|discordbot|slackbot|telegrambot|whatsapp|wechat/i;
 
-const isBotRequest = (req: NextRequest) => {
+const isNextInternalRequest = (req: NextRequest) =>
+    req.headers.get('rsc') === '1' ||
+    req.headers.get('next-router-prefetch') === '1' ||
+    !!req.headers.get('next-router-state-tree');
+
+const hasBypassToken = (req: NextRequest) => {
+    const token = process.env.BOT_BLOCK_BYPASS_TOKEN;
+    if (!token) return false;
+
+    return (
+        req.headers.get('x-bypass-token') === token ||
+        req.nextUrl.searchParams.get('bypass') === token
+    );
+};
+
+const isSuspiciousRequest = (req: NextRequest) => {
+    if (isNextInternalRequest(req)) return false;
+
     const userAgent = req.headers.get('user-agent') ?? '';
-    if (!userAgent) return false;
-    return botUserAgentRegex.test(userAgent);
+    if (!userAgent) return true;
+
+    if (botUserAgentRegex.test(userAgent)) return true;
+
+    const accept = req.headers.get('accept') ?? '';
+    const acceptLanguage = req.headers.get('accept-language') ?? '';
+    const acceptEncoding = req.headers.get('accept-encoding') ?? '';
+
+    const isHtmlAccept =
+        accept.includes('text/html') || accept.includes('application/xhtml+xml');
+    const hasBrowserHeaders = !!acceptLanguage && !!acceptEncoding;
+
+    return !(isHtmlAccept && hasBrowserHeaders);
 };
 
 export default clerkMiddleware((auth, req) => {
@@ -35,7 +63,8 @@ export default clerkMiddleware((auth, req) => {
     if (
         (req.method === 'GET' || req.method === 'HEAD') &&
         isBotSensitiveRoute(req) &&
-        isBotRequest(req)
+        !hasBypassToken(req) &&
+        isSuspiciousRequest(req)
     ) {
         return new NextResponse('Forbidden', { status: 403 });
     }
