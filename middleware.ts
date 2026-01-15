@@ -24,6 +24,9 @@ const isBotSensitiveRoute = createRouteMatcher([
 const botUserAgentRegex =
     /bot|crawler|spider|crawl|slurp|curl|wget|python-requests|httpclient|libwww|scrapy|axios|go-http-client|java|okhttp|wordpress|ahrefs|semrush|mj12bot|dotbot|yandex|bingbot|googlebot|duckduckbot|baiduspider|sogou|facebookexternalhit|facebot|ia_archiver|bitlybot|skypeuripreview|pinterest|discordbot|slackbot|telegrambot|whatsapp|wechat/i;
 
+const browserUserAgentRegex =
+    /mozilla\/5\.0|applewebkit|chrome|safari|firefox|edg|opr\//i;
+
 const isNextInternalRequest = (req: NextRequest) =>
     req.headers.get('rsc') === '1' ||
     req.headers.get('next-router-prefetch') === '1' ||
@@ -46,16 +49,25 @@ const isSuspiciousRequest = (req: NextRequest) => {
     if (!userAgent) return true;
 
     if (botUserAgentRegex.test(userAgent)) return true;
+    if (!browserUserAgentRegex.test(userAgent)) return true;
 
     const accept = req.headers.get('accept') ?? '';
     const acceptLanguage = req.headers.get('accept-language') ?? '';
     const acceptEncoding = req.headers.get('accept-encoding') ?? '';
+    const secFetchMode = req.headers.get('sec-fetch-mode') ?? '';
+    const secFetchDest = req.headers.get('sec-fetch-dest') ?? '';
+    const secFetchSite = req.headers.get('sec-fetch-site') ?? '';
+    const secChUa = req.headers.get('sec-ch-ua') ?? '';
+    const secChUaPlatform = req.headers.get('sec-ch-ua-platform') ?? '';
+    const secChUaMobile = req.headers.get('sec-ch-ua-mobile') ?? '';
 
     const isHtmlAccept =
         accept.includes('text/html') || accept.includes('application/xhtml+xml');
     const hasBrowserHeaders = !!acceptLanguage && !!acceptEncoding;
+    const hasSecFetch = !!secFetchMode && !!secFetchDest && !!secFetchSite;
+    const hasClientHints = !!secChUa && !!secChUaPlatform && !!secChUaMobile;
 
-    return !(isHtmlAccept && hasBrowserHeaders);
+    return !(isHtmlAccept && (hasSecFetch || hasClientHints || hasBrowserHeaders));
 };
 
 export default clerkMiddleware((auth, req) => {
@@ -66,7 +78,7 @@ export default clerkMiddleware((auth, req) => {
         !hasBypassToken(req) &&
         isSuspiciousRequest(req)
     ) {
-        return new NextResponse('Forbidden', { status: 403 });
+        return new NextResponse(null, { status: 403 });
     }
 
     if (isProtectedRoute(req)) {
